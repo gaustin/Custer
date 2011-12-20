@@ -3,10 +3,11 @@
     [speclj.core]
     [navajo.core]))
 
-(describe "http.parsing"
+(describe "http.utilities"
 
   (it "should parse a request line"
     (should= "GET" (:method (parse-request-line "GET /"))))
+
 
 ;  (it "should write a message to a socket"
 ;    (let [server start-http-server 8080)
