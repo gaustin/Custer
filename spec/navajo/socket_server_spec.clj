@@ -34,11 +34,11 @@
 
   (it "reads a byte sequence from a stream"
     (let [msg "Hello"
-          pin (java.io.PipedInputStream.)
-          pout (java.io.PipedOutputStream. pin)
-          os (java.io.PrintStream. pout)]
-      (.write pout (.getBytes msg) 0 (.length msg))
-      (should= (.getBytes msg) (read-byte-seq-from-stream [pin]))))
+          os (java.io.ByteArrayOutputStream.)]
+      (.write os (.getBytes msg))
+      (.flush os)
+      (.close os)
+      (should= (seq (.getBytes msg)) (read-byte-seq-from-stream (java.io.ByteArrayInputStream. (.toByteArray os))))))
  
   (it "sends the client a message"
     (let [message "Hello, World!\r\n"
