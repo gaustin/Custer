@@ -1,7 +1,8 @@
 (ns navajo.socket-server-spec
   (:use
     [speclj.core]
-    [navajo.socket-server]))
+    [navajo.socket-server]
+    [navajo.streams]))
 
 (describe "socket-server"
   (with server (start-server 8080))
@@ -26,19 +27,6 @@
       (java.net.Socket. (.getInetAddress @server) 8080)
       @accept-future
       (should= 1 @counter)))
- 
-  (it "converts a byte sequence to a string"
-    (let [msg "Hello"]
-      (should= msg (byte-seq-to-string (.getBytes msg)))))
-
-
-  (it "reads a byte sequence from a stream"
-    (let [msg "Hello"
-          os (java.io.ByteArrayOutputStream.)]
-      (.write os (.getBytes msg))
-      (.flush os)
-      (.close os)
-      (should= (seq (.getBytes msg)) (read-byte-seq-from-stream (java.io.ByteArrayInputStream. (.toByteArray os))))))
  
   (it "sends the client a message"
     (let [message "Hello, World!\r\n"
