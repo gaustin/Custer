@@ -1,10 +1,14 @@
 # navajo
 
-FIXME: write description
+A super simple web server. Someday it will mostly support HTTP 1.1.
+
+It's so full of holes, that it might get renamed Custer.
 
 ## Usage
 
-FIXME: write
+    lein deps
+
+    bin/navajo.sh
 
 ## License
 
