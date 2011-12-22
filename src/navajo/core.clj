@@ -1,5 +1,6 @@
 (ns navajo.core
   (:use
+    [clojure.string]
     [navajo.socket-server]))
 
 (defn parse-request-line [request-line]
@@ -14,7 +15,7 @@
 (defn start-http-server [port]
   (let [server (start-server port)]
     (do (accept-connection server 
-      (fn [socket] (respond (.getOutputStream socket) "200 OK\r\nHello")
+      (fn [socket] (respond (.getOutputStream socket) "HTTP/1.1 200 OK\r\n\r\nHello")
         (.close socket)))
     server)))
 

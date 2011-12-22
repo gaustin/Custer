@@ -14,7 +14,7 @@
   (it "should get a response from the server"
     (let [server (start-http-server 8080)
           client (java.net.Socket. (.getInetAddress server) (.getLocalPort server))]
-      (should= "200 OK\r\nHello" 
+      (should= "HTTP/1.1 200 OK\r\n\r\nHello" 
         (byte-seq-to-string (read-byte-seq-from-stream (.getInputStream client)))))))
 
 (run-specs)
