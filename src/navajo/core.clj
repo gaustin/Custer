@@ -12,12 +12,16 @@
   (.flush os)
   (.close os))
 
+(defn accept-fn [server] 
+  (fn [client-socket] 
+    (respond (.getOutputStream client-socket) "HTTP/1.1 200 OK\r\n\r\nHello")
+    (.close client-socket)
+    (accept-connection server (accept-fn server))))
+
 (defn start-http-server [port]
   (let [server (start-server port)]
-    (do (accept-connection server 
-      (fn [socket] (respond (.getOutputStream socket) "HTTP/1.1 200 OK\r\n\r\nHello")
-        (.close socket)))
-    server)))
+    (do (accept-connection server (accept-fn server))
+        server)))
 
 (defn -main [& args]
   (start-http-server 8080))
