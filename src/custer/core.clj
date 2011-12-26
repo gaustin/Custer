@@ -1,7 +1,7 @@
-(ns navajo.core
+(ns custer.core
   (:use
     [clojure.string]
-    [navajo.socket-server]))
+    [custer.socket-server]))
 
 (defn parse-request-line [request-line]
   (let [pair (clojure.string/split "GET /" #"\s")]

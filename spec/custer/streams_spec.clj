@@ -1,7 +1,7 @@
-(ns navajo.streams-spec
+(ns custer.streams-spec
   (:use
     [speclj.core]
-    [navajo.streams]))
+    [custer.streams]))
 
 (describe "streams"
   (it "converts a byte sequence to a string"

@@ -1,8 +1,8 @@
-(ns navajo.core-spec
+(ns custer.core-spec
   (:use 
     [speclj.core]
-    [navajo.core]
-    [navajo.streams]
+    [custer.core]
+    [custer.streams]
 ))
 
 (defn new-client [server] (java.net.Socket. (.getInetAddress server) (.getLocalPort server)))

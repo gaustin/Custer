@@ -1,8 +1,8 @@
-(ns navajo.socket-server-spec
+(ns custer.socket-server-spec
   (:use
     [speclj.core]
-    [navajo.socket-server]
-    [navajo.streams]))
+    [custer.socket-server]
+    [custer.streams]))
 
 (describe "socket-server"
   (with server (start-server 8080))

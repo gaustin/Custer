@@ -1,14 +1,14 @@
-# navajo
+# The Custer Web Server 
+
+Custer is full of holes.
 
 A super simple web server. Someday it will mostly support HTTP 1.1.
-
-It's so full of holes, that it might get renamed Custer.
 
 ## Usage
 
     lein deps
 
-    bin/navajo.sh
+    bin/custer.sh
 
 ## License
 

@@ -1,4 +1,4 @@
-(ns navajo.streams)
+(ns custer.streams)
 
 (defn read-byte-seq-from-stream [stream]
   (let [result (.read stream)]

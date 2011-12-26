@@ -1,4 +1,4 @@
-(ns navajo.socket-server)
+(ns custer.socket-server)
 
 (defn start-server [port]
   (new java.net.ServerSocket port))
