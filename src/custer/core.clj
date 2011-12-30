@@ -12,15 +12,14 @@
   (.flush os)
   (.close os))
 
-(defn accept-fn [server] 
-  (fn [client-socket] 
+(defn accept-fn [server client-socket] 
     (respond (.getOutputStream client-socket) "HTTP/1.1 200 OK\r\n\r\nHello")
     (.close client-socket)
-    (accept-connection server (accept-fn server))))
+    (accept-connection server (partial accept-fn server)))
 
 (defn start-http-server [port]
   (let [server (start-server port)]
-    (do (accept-connection server (accept-fn server))
+    (do (accept-connection server (partial accept-fn server))
         server)))
 
 (defn -main [& args]
