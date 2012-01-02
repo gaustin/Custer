@@ -1,7 +1,9 @@
 (ns custer.core
-  (:use
-    [clojure.string]
-    [custer.socket-server]))
+  (:require [clojure.string])
+  (:use [custer.streams]))
+
+(defn start-server [port]
+  (new java.net.ServerSocket port))
 
 (defn parse-request-line [request-line]
   (let [pair (clojure.string/split "GET /" #"\s")]
@@ -9,18 +11,25 @@
 
 (defn respond [os message]
   (.write os (.getBytes message))
-  (.flush os)
-  (.close os))
+  (.flush os))
 
-(defn accept-fn [server client-socket] 
+(defn accept-fn [server client-socket]
+    ;(byte-seq-to-string (read-byte-seq-from-stream (.getInputStream client-socket)))
     (respond (.getOutputStream client-socket) "HTTP/1.1 200 OK\r\n\r\nHello")
-    (.close client-socket)
-    (accept-connection server (partial accept-fn server)))
+    (doto client-socket
+      (.shutdownInput)
+      (.shutdownOutput) 
+      (.close)))
 
-(defn start-http-server [port]
-  (let [server (start-server port)]
-    (do (accept-connection server (partial accept-fn server))
-        server)))
+(defn accept-connection [server fun]
+  (let [socket (.accept server)]
+    (future 
+      (try 
+        (fun socket)
+        (catch java.net.SocketException e (println (.getMessage e))))))
+  (recur server (partial accept-fn server)))
 
 (defn -main [& args]
-  (start-http-server 8080))
+  (let [server (start-server 8282)] 
+    (future (accept-connection server (partial accept-fn server)))
+    server))
