@@ -1,32 +1,34 @@
 (ns custer.core
-  (:require [clojure.string])
-  (:use [custer.streams]))
+  (:import (java.net ServerSocket SocketException))
+  (:use [custer.io :only (read-str write-message)]
+        [clojure.string :only (split)]))
 
 (defn start-server [port]
-  (new java.net.ServerSocket port))
+  (ServerSocket. port))
 
 (defn parse-request-line [request-line]
-  (let [pair (clojure.string/split "GET /" #"\s")]
+  (let [pair (split "GET /" #"\s")]
     {:method (first pair) :uri (last pair) }))
 
-(defn respond [os message]
-  (.write os (.getBytes message))
-  (.flush os))
+(defn close-socket [socket]
+  (doto socket
+    (.shutdownInput)
+    (.shutdownOutput) 
+    (.close)))
 
 (defn accept-fn [server client-socket]
-    ;(byte-seq-to-string (read-byte-seq-from-stream (.getInputStream client-socket)))
-    (respond (.getOutputStream client-socket) "HTTP/1.1 200 OK\r\n\r\nHello")
-    (doto client-socket
-      (.shutdownInput)
-      (.shutdownOutput) 
-      (.close)))
+  (let [ins (.getInputStream client-socket)
+        outs (.getOutputStream client-socket)]
+    (read-str ins)
+    (write-message outs "HTTP/1.1 200 OK\r\n\r\nHello\r\n\r\n"))
+    (close-socket client-socket))
 
 (defn accept-connection [server fun]
   (let [socket (.accept server)]
     (future 
       (try 
         (fun socket)
-        (catch java.net.SocketException e (println (.getMessage e))))))
+        (catch SocketException e (println (.getMessage e))))))
   (recur server (partial accept-fn server)))
 
 (defn -main [& args]
