@@ -1,6 +1,7 @@
 (ns custer.core-spec
-  (:import (java.io BufferedReader StringReader PrintWriter InputStreamReader
-                    ByteArrayOutputStream ByteArrayInputStream InputStream OutputStream)
+  (:import (java.io PrintWriter BufferedReader
+                    BufferedWriter InputStream
+                    ByteArrayInputStream ByteArrayOutputStream)
            (java.net Socket)) 
   (:use 
     [speclj.core]
@@ -8,15 +9,17 @@
     [custer.io]
     [clojure.java.io :only (reader writer)]))
 
-;(defn fake-reader
-;  [ins reader-read]
-;  (proxy [BufferedReader] [(InputStreamReader. ins)]
-;    (readLine [] (swap! read-ins-called (fn [a] true)))))
-;
-;(defn fake-outs
-;  [write-outs-called]
-;  (proxy [OutputStream] []
-;    (write [] (swap! write-outs-called (fn [a] true)))))
+(defn fake-reader
+  [reader-read]
+  (proxy [BufferedReader] [(reader (ByteArrayInputStream. (.toByteArray (ByteArrayOutputStream.))))]
+    (readLine [] 
+      (swap! reader-read (fn [a] true))
+      "")))
+
+(defn fake-outs
+  [writer-written-to]
+  (proxy [BufferedWriter] [(writer (ByteArrayOutputStream.))]
+    (write [message] (swap! writer-written-to (fn [a] true)))))
 
 (defn fake-client [server] 
   (let [socket (java.net.Socket. (.getInetAddress server) (.getLocalPort server))
@@ -85,12 +88,12 @@
       (should= true @shutdown-out-called)
       (should= true @close-called)))
 
-;  (it "accept-fn should read from ins and write to outs"
-;    (let [reader-read (atom false)
-;          write-outs-called (atom false)]
-;      (accept-fn (fake-reader @reader-read) (fake-outs @write-outs-called))
-;      (should= true @read-ins-called)
-;      (should= true @write-outs-called)))
+  (it "accept-fn should read from ins and write to outs"
+    (let [reader-read (atom false)
+          writer-written-to (atom false)]
+      (accept-fn (fake-reader reader-read) (fake-outs writer-written-to))
+      (should= true @reader-read)
+      (should= true @writer-written-to)))
 
   (it "should get a response from the server"
     (let [server (atom @server)]

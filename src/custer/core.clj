@@ -1,6 +1,5 @@
 (ns custer.core
-  (:import (java.net ServerSocket SocketException)
-           (java.io PrintWriter))
+  (:import (java.net ServerSocket SocketException))
   (:use [custer.io :only (read-str write-message)]
         [clojure.string :only (split)]
         [clojure.java.io :only (reader writer)]))
