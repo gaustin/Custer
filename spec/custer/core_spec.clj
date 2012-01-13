@@ -43,9 +43,6 @@
   (with expected-response "HTTP/1.1 200 OK") 
   (after (.close @server))
 
-  (it "should parse a request line"
-    (should= "GET" (:method (parse-request-line "GET /"))))
-
   (it "should start the server"
     (should-not (.isClosed @server)))
 

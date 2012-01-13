@@ -21,14 +21,20 @@
 (defn parse-method-line [raw-method-line]
   (split raw-method-line #"\s"))
 
+(defn parse-request-seq [raw-request]
+  (let [method-path-pair (parse-method-line (first raw-request))]
+    (Request. (first method-path-pair)
+              (second method-path-pair)
+              (parse-headers (rest raw-request) {}))))
+
+(defn parse-request-other [raw-request]
+  (let [method-path-pair (parse-method-line raw-request)]
+    (Request. (first method-path-pair)
+              (second method-path-pair)
+              {})))
+
 (defn parse-request [raw-request]
   (if (seq? raw-request)
-    (let [method-path-pair (parse-method-line (first raw-request))]
-      (Request. (first method-path-pair) 
-                (second method-path-pair)
-                (parse-headers (rest raw-request) {})))
-    (let [method-path-pair (parse-method-line raw-request)]
-      (Request. (first method-path-pair)
-                (second method-path-pair)
-                {}))))
+    (parse-request-seq raw-request)
+    (parse-request-other raw-request)))
 
