@@ -14,6 +14,13 @@
           reader (BufferedReader. (StringReader. @message))] 
       (should= expected-response (read-to-empty-line reader))))
 
+  (it "should read individual lines as elements in a seq"
+    (let [reader (BufferedReader. (StringReader. "Hello\r\nWorld\r\n\r\nWide"))
+          result (read-to-empty-line reader)]
+      (should= "Hello" (first result))
+      (should= "World" (second result))
+      (should= 2 (count result))))
+
   (it "should read a string up to a blank line from an InputStream"
     (let [outs (ByteArrayOutputStream.)]
       (.write outs (.getBytes @message))
