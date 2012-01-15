@@ -15,11 +15,12 @@
       (should= expected-response (read-to-empty-line reader))))
 
   (it "should read individual lines as elements in a seq"
-    (let [reader (BufferedReader. (StringReader. "Hello\r\nWorld\r\n\r\nWide"))
+    (let [reader (BufferedReader. (StringReader. "Hello\r\nWorld\r\n\r\nWide\r\n\r\n"))
           result (read-to-empty-line reader)]
       (should= "Hello" (first result))
       (should= "World" (second result))
-      (should= 2 (count result))))
+      (should= 2 (count result))
+      (should= 1 (count (read-to-empty-line reader)))))
 
   (it "should read a string up to a blank line from an InputStream"
     (let [outs (ByteArrayOutputStream.)]
@@ -32,6 +33,6 @@
     (let [outs (ByteArrayOutputStream.)]
       (write-message (writer outs) @message)
       (.close outs)
-      (should= "Hi" (read-str (reader (ByteArrayInputStream. (.toByteArray outs))))))))    
+      (should= "Hi" (read-str (reader (ByteArrayInputStream. (.toByteArray outs))))))))
 
 (run-specs)

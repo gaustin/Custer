@@ -1,7 +1,7 @@
 (ns custer.core
   (:import (java.net ServerSocket SocketException))
-  (:use [custer.io :only (read-to-empty-line write-message)]
-        [custer.requests]
+  (:use [custer.io :only (read-str read-to-empty-line write-message)]
+        [custer.request_parsing]
         [clojure.java.io :only (reader writer)]))
 
 (defn start-server [port]

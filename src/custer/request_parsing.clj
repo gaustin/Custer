@@ -1,10 +1,10 @@
-(ns custer.requests
+(ns custer.request_parsing
   (:use [clojure.string :only (lower-case split)]))
 
 (defprotocol Printable
   (print-to-s [this]))
 
-(defrecord Request [method path headers]
+(defrecord Request [method path headers body]
   Printable
   (print-to-s [this]
     (binding [*print-dup* true] (prn-str this))))
@@ -31,13 +31,15 @@
   (let [method-path-pair (parse-method-line (first raw-request))]
     (Request. (first method-path-pair)
               (second method-path-pair)
-              (parse-headers (rest raw-request) {}))))
+              (parse-headers (rest raw-request) {})
+              nil)))
 
 (defn parse-request-str [raw-request]
   (let [method-path-pair (parse-method-line raw-request)]
     (Request. (first method-path-pair)
               (second method-path-pair)
-              {})))
+              {}
+              nil)))
 
 (defn parse-request [raw-request]
   (if (seq? raw-request)

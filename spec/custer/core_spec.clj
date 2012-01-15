@@ -8,7 +8,7 @@
     [clojure.string :only (trim)]
     [custer.core]
     [custer.io]
-    [custer.requests]
+    [custer.request_parsing]
     [clojure.java.io :only (reader writer)]))
 
 (defn fake-reader
@@ -34,7 +34,9 @@
       (apply str '("GET / HTTP/1.0\r\n"
         "Host: www.example.com\r\n"
         "User-Agent: 007\r\n"
-        "Accept: text/html\r\n"
+        "Accept: text/html"
+        "\r\n\r\n"
+        "Body"
         "\r\n\r\n")))
     socket))
 

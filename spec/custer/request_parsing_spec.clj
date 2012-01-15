@@ -1,6 +1,6 @@
-(ns custer.requests-spec
+(ns custer.request_parsing-spec
   (:use [speclj.core]
-        [custer.requests]))
+        [custer.request_parsing]))
 
 (describe "requests"
   (with full-request
@@ -18,7 +18,8 @@
     (let [request (parse-request-str (first @full-request))]
       (should= "GET" (:method request))
       (should= "/" (:path request))
-      (should= {} (:headers request))))
+      (should= {} (:headers request))
+      (should= nil (:body request))))
 
   (it "should parse method line of a GET"
     (let [request (parse-request @full-request)]
@@ -55,5 +56,5 @@
       (should= "text/html" (:accept headers))))
 
   (it "should be able to print a request object to a string"
-    (let [request (custer.requests.Request. "GET" "/" {:foo "bar"})]
+    (let [request (custer.request_parsing.Request. "GET" "/" {:foo "bar"} nil)]
       (should= (binding [*print-dup* true] (prn-str request)) (print-to-s request)))))
