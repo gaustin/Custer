@@ -1,7 +1,13 @@
 (ns custer.requests
   (:use [clojure.string :only (lower-case split)]))
 
-(defrecord Request [method path headers])
+(defprotocol Printable
+  (print-to-s [this]))
+
+(defrecord Request [method path headers]
+  Printable
+  (print-to-s [this]
+    (binding [*print-dup* true] (prn-str this))))
 
 (defn lc-keyword [kw]
   (keyword (lower-case kw)))
@@ -27,7 +33,7 @@
               (second method-path-pair)
               (parse-headers (rest raw-request) {}))))
 
-(defn parse-request-other [raw-request]
+(defn parse-request-str [raw-request]
   (let [method-path-pair (parse-method-line raw-request)]
     (Request. (first method-path-pair)
               (second method-path-pair)
@@ -36,5 +42,6 @@
 (defn parse-request [raw-request]
   (if (seq? raw-request)
     (parse-request-seq raw-request)
-    (parse-request-other raw-request)))
+    (parse-request-str raw-request))) ; Got a one-line request. No headers.
+
 

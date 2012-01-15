@@ -5,16 +5,22 @@
            (java.net Socket)) 
   (:use 
     [speclj.core]
+    [clojure.string :only (trim)]
     [custer.core]
     [custer.io]
+    [custer.requests]
     [clojure.java.io :only (reader writer)]))
 
 (defn fake-reader
   [reader-read]
-  (proxy [BufferedReader] [(reader (ByteArrayInputStream. (.toByteArray (ByteArrayOutputStream.))))]
-    (readLine [] 
-      (swap! reader-read (fn [a] true))
-      "")))
+  (let [first-time (atom true)]
+    (proxy 
+      [BufferedReader] [(reader (ByteArrayInputStream. (.toByteArray (ByteArrayOutputStream.))))]
+      (readLine [] 
+        (swap! reader-read (fn [a] true))
+          (if (= true @first-time)
+            (do (swap! first-time (fn [a] false)) "GET / HTTP/1.1")
+            "")))))
 
 (defn fake-outs
   [writer-written-to]
@@ -24,7 +30,12 @@
 (defn fake-client [server] 
   (let [socket (java.net.Socket. (.getInetAddress server) (.getLocalPort server))
         outs (.getOutputStream socket)]
-    (write-message (PrintWriter. outs) "GET / HTTP/1.0\r\n\r\n")
+    (write-message (PrintWriter. outs)
+      (apply str '("GET / HTTP/1.0\r\n"
+        "Host: www.example.com\r\n"
+        "User-Agent: 007\r\n"
+        "Accept: text/html\r\n"
+        "\r\n\r\n")))
     socket))
 
 (defn read-from-socket-ins [socket]
@@ -40,7 +51,13 @@
 
 (describe "core"
   (with server (start-server 8181))
-  (with expected-response "HTTP/1.1 200 OK") 
+  (with expected-response
+    (trim (print-to-s
+      (parse-request
+        '("GET / HTTP/1.0"
+          "Host: www.example.com"
+          "User-Agent: 007"
+          "Accept: text/html")))))
   (after (.close @server))
 
   (it "should start the server"

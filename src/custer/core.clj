@@ -1,15 +1,11 @@
 (ns custer.core
   (:import (java.net ServerSocket SocketException))
-  (:use [custer.io :only (read-str write-message)]
-        [clojure.string :only (split)]
+  (:use [custer.io :only (read-to-empty-line write-message)]
+        [custer.requests]
         [clojure.java.io :only (reader writer)]))
 
 (defn start-server [port]
   (ServerSocket. port))
-
-(defn parse-request-line [request-line]
-  (let [pair (split "GET /" #"\s")]
-    {:method (first pair) :uri (last pair) }))
 
 (defn close-socket [socket]
   (doto socket
@@ -18,8 +14,11 @@
     (.close)))
 
 (defn accept-fn [reader writer]
-    (read-str reader)
-    (write-message writer "HTTP/1.1 200 OK\r\n\r\nHello\r\n\r\n"))
+    (let [raw-request (read-to-empty-line reader)
+          request (parse-request raw-request)]
+      (write-message writer (.concat
+                              (print-to-s request)
+                              "\r\n\r\n" ))))
 
 (defn accept-connection [server fun]
   (let [socket (.accept server)]
