@@ -132,5 +132,3 @@
       (should= @expected-response 
         (read-from-socket-ins (fake-client @server))))))
 
-(run-specs)
-

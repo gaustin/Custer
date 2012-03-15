@@ -35,4 +35,3 @@
       (.close outs)
       (should= "Hi" (read-str (reader (ByteArrayInputStream. (.toByteArray outs))))))))
 
-(run-specs)
