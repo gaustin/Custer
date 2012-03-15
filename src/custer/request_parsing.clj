@@ -1,5 +1,5 @@
 (ns custer.request_parsing
-  (:use [clojure.string :only (lower-case split)]))
+  (:use [clojure.string :only (lower-case split join)]))
 
 (defprotocol Printable
   (print-to-s [this]))
@@ -28,11 +28,12 @@
   (split raw-method-line #"\s"))
 
 (defn parse-request-seq [raw-request]
-  (let [method-path-pair (parse-method-line (first raw-request))]
+  (let [method-path-pair (parse-method-line (first raw-request))
+        headers-and-body (split-with (fn [x] (not (empty? x))) (rest raw-request))]
     (Request. (first method-path-pair)
               (second method-path-pair)
-              (parse-headers (rest raw-request) {})
-              nil)))
+              (parse-headers (first headers-and-body) {})
+              (join "" (second headers-and-body)))))
 
 (defn parse-request-str [raw-request]
   (let [method-path-pair (parse-method-line raw-request)]

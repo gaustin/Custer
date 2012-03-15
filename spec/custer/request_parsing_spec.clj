@@ -57,4 +57,15 @@
 
   (it "should be able to print a request object to a string"
     (let [request (custer.request_parsing.Request. "GET" "/" {:foo "bar"} nil)]
-      (should= (binding [*print-dup* true] (prn-str request)) (print-to-s request)))))
+      (should= (binding [*print-dup* true] (prn-str request)) (print-to-s request))))
+
+  (it "should read the request body"
+    (let [post-request '("POST /new HTTP/1.1"
+                         "User-Agent: 007"
+                         "Content-Type: application/x-www-form-urlencoded"
+                         "Content-Length: 10"
+                         ""
+                         "user=grant")
+          request (parse-request post-request)]
+    (should= "user=grant" (:body request)))))
+
