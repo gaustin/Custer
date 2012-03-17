@@ -31,6 +31,9 @@
   (recur server accept-fn))
 
 (defn -main [& args]
-  (let [server (start-server 8282)] 
+  (let [port (if (not (nil? args))
+                (. Integer parseInt (first args))
+                8080)
+        server (start-server port)] 
     (future (accept-connection server accept-fn))
     server))

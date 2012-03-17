@@ -1,2 +1,2 @@
-lein run -m custer.core
+lein run -m custer.core $1
 
