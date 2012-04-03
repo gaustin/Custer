@@ -27,13 +27,17 @@
 (defn parse-method-line [raw-method-line]
   (split raw-method-line #"\s"))
 
+; TODO: This method is overloaded with logic. Clean it up.
 (defn parse-request-seq [raw-request]
   (let [method-path-pair (parse-method-line (first raw-request))
-        headers-and-body (split-with (fn [x] (not (empty? x))) (rest raw-request))]
+        headers-and-body (split-with (fn [x] (not (empty? x))) (rest raw-request))
+        headers (first headers-and-body)
+        ; TODO: This isn't the right way to parse the body, but it works for now.
+        body (join "" (flatten (rest headers-and-body)))]
     (Request. (first method-path-pair)
               (second method-path-pair)
               (parse-headers (first headers-and-body) {})
-              (join "" (second headers-and-body)))))
+              body)))
 
 (defn parse-request-str [raw-request]
   (let [method-path-pair (parse-method-line raw-request)]
