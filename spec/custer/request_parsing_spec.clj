@@ -3,26 +3,34 @@
         [custer.request_parsing]))
 
 (describe "requests"
-  (with full-request
+  (with get-request
     '("GET / HTTP/1.1"
       "Host: localhost"
       "User-Agent: 007"
       "Accept: text/html"))
 
+  (with post-request
+    '("POST /new HTTP/1.1"
+      "User-Agent: 007"
+      "Content-Type: application/x-www-form-urlencoded"
+      "Content-Length: 10"
+      ""
+      "user=grant"))
+
   (it "should parse method line of a GET"
-    (let [method-pair (parse-method-line (first @full-request))]
+    (let [method-pair (parse-method-line (first @get-request))]
       (should= "GET" (first method-pair))
       (should= "/" (second method-pair))))
 
   (it "should return a request from a one-line request"
-    (let [request (parse-request-str (first @full-request))]
+    (let [request (parse-request-str (first @get-request))]
       (should= "GET" (:method request))
       (should= "/" (:path request))
       (should= {} (:headers request))
       (should= nil (:body request))))
 
   (it "should parse method line of a GET"
-    (let [request (parse-request @full-request)]
+    (let [request (parse-request @get-request)]
       (should= "GET" (:method request))
       (should= "/" (:path request))))
 
@@ -40,7 +48,7 @@
       (should= "www.example.com" (second header))))
 
   (it "should return a request from a sequence"
-    (let [request (parse-request-seq @full-request)
+    (let [request (parse-request-seq @get-request)
           headers (:headers request)]
       (should= 3 (count (keys headers)))
       (should= "localhost" (:host headers))
@@ -48,7 +56,7 @@
       (should= "text/html" (:accept headers))))
 
   (it "should parse headers"
-    (let [request (parse-request @full-request)
+    (let [request (parse-request @get-request)
           headers (:headers request)]
       (should= 3 (count (keys headers)))
       (should= "localhost" (:host headers))
@@ -59,13 +67,12 @@
     (let [request (custer.request_parsing.Request. "GET" "/" {:foo "bar"} nil)]
       (should= (binding [*print-dup* true] (prn-str request)) (print-to-s request))))
 
+  (it "should extract the headers and body from a request"
+    (let [headers-and-body (extract-headers-and-body (rest @post-request))]
+      (should= (take 3 (rest @post-request)) (:headers headers-and-body))
+      (should= '("" "user=grant") (:body headers-and-body))))
+
   (it "should read the request body"
-    (let [post-request '("POST /new HTTP/1.1"
-                         "User-Agent: 007"
-                         "Content-Type: application/x-www-form-urlencoded"
-                         "Content-Length: 10"
-                         ""
-                         "user=grant")
-          request (parse-request post-request)]
-    (should= "user=grant" (:body request)))))
+    (let [request (parse-request @post-request)]
+      (should= "user=grant" (:body request)))))
 

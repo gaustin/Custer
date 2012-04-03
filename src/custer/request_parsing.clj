@@ -27,16 +27,24 @@
 (defn parse-method-line [raw-method-line]
   (split raw-method-line #"\s"))
 
-; TODO: This method is overloaded with logic. Clean it up.
+(defn extract-headers-and-body [raw-request]
+; Expects everything but the method line
+  (let [headers-and-body (split-with (fn [x] (not (empty? x))) raw-request)]
+    { 
+      :headers (first headers-and-body),
+      :body (flatten (rest headers-and-body))
+    }
+  ))
+
 (defn parse-request-seq [raw-request]
   (let [method-path-pair (parse-method-line (first raw-request))
-        headers-and-body (split-with (fn [x] (not (empty? x))) (rest raw-request))
-        headers (first headers-and-body)
+        headers-and-body (extract-headers-and-body (rest raw-request))
+        headers (:headers headers-and-body)
         ; TODO: This isn't the right way to parse the body, but it works for now.
-        body (join "" (flatten (rest headers-and-body)))]
+        body (join "" (:body headers-and-body))]
     (Request. (first method-path-pair)
               (second method-path-pair)
-              (parse-headers (first headers-and-body) {})
+              (parse-headers headers {})
               body)))
 
 (defn parse-request-str [raw-request]
