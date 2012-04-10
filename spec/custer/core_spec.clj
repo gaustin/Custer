@@ -14,7 +14,16 @@
 
 (describe "core"
   (with server (start-server 8181))
-  (with expected-response
+  (with expected-post-response
+   (trim (print-to-s
+     (parse-request
+       '("GET / HTTP/1.0"
+         "Host: www.example.com"
+         "User-Agent: 007"
+         "Accept: text/html"
+         ""
+         "Body")))))
+  (with expected-get-response
     (trim (print-to-s
       (parse-request
         '("GET / HTTP/1.0"
@@ -73,16 +82,17 @@
       (should= true @writer-written-to)))
 
   (it "should get a response from the server"
+    (println "target test")
     (let [server (atom @server)]
       (future (accept-connection @server accept-fn))
-      (should= @expected-response 
+      (should= @expected-get-response 
         (read-from-socket-ins (fake-client @server)))))
 
   (it "should get a response from the server on the second request"
     (let [server (atom @server)]
       (future (accept-connection @server accept-fn))
       (read-from-socket-ins (fake-client @server))
-      (should= @expected-response 
+      (should= @expected-get-response 
         (read-from-socket-ins (fake-client @server)))))
 
   (it "should get a response from the server on the third request"
@@ -90,6 +100,6 @@
       (future (accept-connection @server accept-fn))
       (read-from-socket-ins (fake-client @server))
       (read-from-socket-ins (fake-client @server))
-      (should= @expected-response 
+      (should= @expected-get-response 
         (read-from-socket-ins (fake-client @server))))))
 
