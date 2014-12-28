@@ -1,0 +1,1 @@
+0. Add serving static files.
