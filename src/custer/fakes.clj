@@ -4,7 +4,7 @@
                       ByteArrayInputStream ByteArrayOutputStream)
              (java.net Socket))
   (:use
-    [custer.io]
+    [custer.io :exclude (read-to-empty-line)]
     [clojure.java.io :only (reader writer)]))
 
 (defn fake-reader

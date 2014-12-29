@@ -6,9 +6,10 @@
   (:use
     [speclj.core]
     [clojure.string :only (trim)]
-    [custer.core]
-    [custer.io]
+    [custer.core :exclude (-main)]
+    [custer.io :only (write-message)]
     [custer.fakes]
+    ; TODO Figure out how to refer only to parse-request and Request (for print-to-s) here.
     [custer.request_parsing]
     [clojure.java.io :only (reader writer)]))
 

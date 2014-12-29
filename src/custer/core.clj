@@ -1,6 +1,7 @@
 (ns custer.core
   (:import (java.net ServerSocket SocketException))
   (:use [custer.io :only (read-str read-to-empty-line write-message)]
+        ; TODO Figure out how to refer only to parse-request and Request (for print-to-s) here.
         [custer.request_parsing]
         [clojure.java.io :only (reader writer)]))
 
