@@ -1,5 +1,6 @@
-(defproject custer "1.0.0-SNAPSHOT"
+(defproject custer "0.1.0-SNAPSHOT"
   :description "Web server."
-  :dependencies [[org.clojure/clojure "1.2.1"]]
-  :dev-dependencies [[speclj "1.2.0"] [speclj-growl "1.0.1"]]
-  :test-path "spec/")
+  :dependencies [[org.clojure/clojure "1.6.0"]]
+  :profiles {:dev {:dependencies [[speclj "3.1.0"]]}}
+  :plugins [[speclj "3.1.0"]]
+  :test-paths ["spec"])
