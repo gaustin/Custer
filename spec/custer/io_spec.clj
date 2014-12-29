@@ -11,7 +11,7 @@
 
   (it "should read up to a blank line"
     (let [expected-response '("Hi")
-          reader (BufferedReader. (StringReader. @message))] 
+          reader (BufferedReader. (StringReader. @message))]
       (should= expected-response (read-to-empty-line reader))))
 
   (it "should read individual lines as elements in a seq"
@@ -34,4 +34,3 @@
       (write-message (writer outs) @message)
       (.close outs)
       (should= "Hi" (read-str (reader (ByteArrayInputStream. (.toByteArray outs))))))))
-

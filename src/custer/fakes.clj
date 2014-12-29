@@ -3,16 +3,16 @@
                       BufferedWriter InputStream
                       ByteArrayInputStream ByteArrayOutputStream)
              (java.net Socket))
-  (:use 
+  (:use
     [custer.io]
     [clojure.java.io :only (reader writer)]))
 
 (defn fake-reader
   [reader-read]
   (let [first-time (atom true)]
-    (proxy 
+    (proxy
       [BufferedReader] [(reader (ByteArrayInputStream. (.toByteArray (ByteArrayOutputStream.))))]
-      (readLine [] 
+      (readLine []
         (swap! reader-read (fn [a] true))
           (if (= true @first-time)
             (do (swap! first-time (fn [a] false)) "GET / HTTP/1.1")
@@ -23,7 +23,7 @@
   (proxy [BufferedWriter] [(writer (ByteArrayOutputStream.))]
     (write [message] (swap! writer-written-to (fn [a] true)))))
 
-(defn fake-client [server] 
+(defn fake-client [server]
   (let [socket (java.net.Socket. (.getInetAddress server) (.getLocalPort server))
         outs (.getOutputStream socket)]
     (write-message (PrintWriter. outs)
@@ -41,10 +41,8 @@
 
 (defn fake-client-socket
   [server shutdown-in-called shutdown-out-called close-called]
-  (let [set-true (fn [a] true)] 
+  (let [set-true (fn [a] true)]
     (proxy [Socket] [(.getInetAddress @server) (.getLocalPort @server)]
       (shutdownInput [] (swap! shutdown-in-called set-true))
       (shutdownOutput [] (swap! shutdown-out-called set-true))
       (close [] (swap! close-called set-true)))))
-
-

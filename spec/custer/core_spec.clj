@@ -2,8 +2,8 @@
   (:import (java.io PrintWriter BufferedReader
                     BufferedWriter InputStream
                     ByteArrayInputStream ByteArrayOutputStream)
-           (java.net Socket)) 
-  (:use 
+           (java.net Socket))
+  (:use
     [speclj.core]
     [clojure.string :only (trim)]
     [custer.core]
@@ -37,12 +37,12 @@
 
   (it "should have the specified port"
     (should= 8181 (.getLocalPort @server)))
-  
+
   (it "should be bound"
     (should (.isBound @server)))
-    
+
   (it "should be bound to localhost"
-    (should= "0.0.0.0" (.getCanonicalHostName (.getInetAddress @server))))                                           
+    (should= "0.0.0.0" (.getCanonicalHostName (.getInetAddress @server))))
   (it "accepts a connection"
     (let [counter (atom 0)
           action (fn [ins outs] (swap! counter inc))
@@ -51,7 +51,7 @@
       (fake-client @server)
       (. Thread (sleep 1000)) ; action-future never returns
       (should= 1 @counter)))
- 
+
   (it "sends the client a message"
     (let [message "Hello, World!\r\n\r\n"
           action (fn [reader writer]
@@ -69,7 +69,7 @@
           close-called (atom false)
           socket (fake-client-socket
                     server shutdown-in-called shutdown-out-called close-called)]
-      (close-socket socket) 
+      (close-socket socket)
       (should= true @shutdown-in-called)
       (should= true @shutdown-out-called)
       (should= true @close-called)))
@@ -85,14 +85,14 @@
     (println "target test")
     (let [server (atom @server)]
       (future (accept-connection @server accept-fn))
-      (should= @expected-get-response 
+      (should= @expected-get-response
         (read-from-socket-ins (fake-client @server)))))
 
   (it "should get a response from the server on the second request"
     (let [server (atom @server)]
       (future (accept-connection @server accept-fn))
       (read-from-socket-ins (fake-client @server))
-      (should= @expected-get-response 
+      (should= @expected-get-response
         (read-from-socket-ins (fake-client @server)))))
 
   (it "should get a response from the server on the third request"
@@ -100,6 +100,5 @@
       (future (accept-connection @server accept-fn))
       (read-from-socket-ins (fake-client @server))
       (read-from-socket-ins (fake-client @server))
-      (should= @expected-get-response 
+      (should= @expected-get-response
         (read-from-socket-ins (fake-client @server))))))
-

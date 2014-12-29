@@ -30,7 +30,7 @@
 (defn extract-headers-and-body [raw-request]
 ; Expects everything but the method line
   (let [headers-and-body (split-with (fn [x] (not (empty? x))) raw-request)]
-    { 
+    {
       :headers (first headers-and-body),
       :body (flatten (rest headers-and-body))
     }
@@ -58,5 +58,3 @@
   (if (seq? raw-request)
     (parse-request-seq raw-request)
     (parse-request-str raw-request))) ; Got a one-line request. No headers.
-
-

@@ -10,7 +10,7 @@
 (defn close-socket [socket]
   (doto socket
     (.shutdownInput)
-    (.shutdownOutput) 
+    (.shutdownOutput)
     (.close)))
 
 (defn accept-fn [reader writer]
@@ -22,8 +22,8 @@
 
 (defn accept-connection [server fun]
   (let [socket (.accept server)]
-    (future 
-      (try 
+    (future
+      (try
         (fun (reader (.getInputStream socket))
              (writer (.getOutputStream socket)))
         (close-socket socket)
@@ -34,6 +34,6 @@
   (let [port (if (not (nil? args))
                 (. Integer parseInt (first args))
                 8080)
-        server (start-server port)] 
+        server (start-server port)]
     (future (accept-connection server accept-fn))
     server))
