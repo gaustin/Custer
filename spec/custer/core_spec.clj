@@ -83,7 +83,6 @@
       (should= true @writer-written-to)))
 
   (it "should get a response from the server"
-    (println "target test")
     (let [server (atom @server)]
       (future (accept-connection @server accept-fn))
       (should= @expected-get-response
